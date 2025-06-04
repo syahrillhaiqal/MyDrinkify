@@ -3,8 +3,14 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { createUser } from '../../lib/appwrite'
+import { useGlobalContext } from '@/context/GlobalProvider';
 
 export default function App() {
+
+    const { 
+        setUser, 
+        setIsLoggedIn 
+    } = useGlobalContext();
 
     // Set form
     const [form, setForm] = useState({
@@ -38,7 +44,10 @@ export default function App() {
         }
 
         try {
-            const result = await createUser(email, password, username, phoneNum);
+            const result = await createUser(form.email, form.password, form.username, form.phoneNum);
+            setUser(result);
+            setIsLoggedIn(true);
+            
             router.replace("/(tabs)/home");
         } catch (error) {
             const err = error as Error; // Cast to Error type

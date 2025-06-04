@@ -12,11 +12,21 @@ const GlobalProvider = ({ children }) => {
     // Authentication state
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [user, setUser] = useState(null);
+    const [userID, setUserID] = useState('')
+    const [username, setUsername] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     // Water tracking state
-    const [currentWater, setCurrentWater] = useState(200);
-    const [goal, setGoal] = useState(1000);
+    const [currentWater, setCurrentWater] = useState(0);
+    const [goal, setGoal] = useState(0);
+    const [goalID, setGoalID] = useState('');
+
+    // Reset global provider data after signout
+    const resetUserData = () => {
+        setGoal(0);
+        setCurrentWater(0);
+        setGoalID('')
+    }
 
     useEffect(() => {
         // For auto login, get the current user, if null it setIsLoggedIn will be false and no auto login
@@ -48,13 +58,22 @@ const GlobalProvider = ({ children }) => {
                 setIsLoggedIn,
                 user,
                 setUser,
+                userID,
+                setUserID,
+                username,
+                setUsername,
                 isLoading,
 
                 // Water tracking values
                 currentWater,
                 setCurrentWater,
                 goal,
-                setGoal
+                setGoal,
+                goalID,
+                setGoalID,
+
+                // Reset user data in global provider
+                resetUserData
             }}
         >
             {children}

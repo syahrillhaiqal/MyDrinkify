@@ -1,8 +1,9 @@
 import CustomButton from '@/components/CustomButton';
 import { useGlobalContext } from '@/context/GlobalProvider';
+import { createWaterType, getUserWaterTypes, logWaterIntake, updateCurrentAchieved } from '@/lib/appwrite';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
@@ -12,7 +13,9 @@ const Addwater = () => {
   const {
     setCurrentWater,
     currentWater,
-    goal
+    goal,
+    goalID,
+    userID
   } = useGlobalContext();
 
   // State for water entry customization
@@ -26,9 +29,16 @@ const Addwater = () => {
   const [customColorModal, setCustomColorModal] = useState(false);
   const [volumeEditModal, setVolumeEditModal] = useState(false);
 
+  // const [form, setForm] = useState({
+  //       title: '',
+  //       quantity: 1,
+  //       color: '',
+  //       notes: ''
+  //   })
+  
   // Predefined volume options
   const predefinedVolumes = [100, 150, 200, 250, 300, 500, 750, 1000];
-
+  
   // Predefined colors
   const predefinedColors = [
     '#3B82F6', // Blue
@@ -38,6 +48,9 @@ const Addwater = () => {
     '#8B5CF6', // Purple
     '#EC4899', // Pink
   ];
+
+  useEffect(() => {
+  })
 
   const openColorModal = () => {
     setCustomColorModal(true);
@@ -77,7 +90,12 @@ const Addwater = () => {
   };
 
   // Add current water function
-  const addCurrentWater = () => {
+  const addCurrentWater = async () => {
+    console.log('GoalID:', goalID);
+    if (!waterTitle || !glassQuantity || !selectedColor) {
+      return Alert.alert("Error", "Please fill in all the fields.");
+    }
+
     const volume = parseInt(waterVolume) || 100;
     const quantity = parseInt(glassQuantity) || 1;
     const totalAmount = volume * quantity;
@@ -91,22 +109,37 @@ const Addwater = () => {
       return;
     }
     
-    // This before it exceeding, because when added it can be exceeding if we only do the top condition
-    const newWaterAmount = currentWater + totalAmount;
-    
-    if (newWaterAmount >= goal) {
-      setCurrentWater(goal);
-      Alert.alert(
-        "Congratulations! 🎉", 
-        `You've reached your daily water goal! Added ${totalAmount}ml (${quantity} x ${volume}ml)`,
-      );
-    } else {
-      setCurrentWater(newWaterAmount);
-      Alert.alert(
-        "Water Added! 💧",
-        `Added ${totalAmount}ml (${quantity} x ${volume}ml) to your daily intake`
-      );
+    try {    
+      // This before it exceeding, because when added it can be exceeding if we only do the top condition
+      const newWaterAmount = currentWater + totalAmount;
+      
+      if (newWaterAmount >= goal) {
+        await updateCurrentAchieved(goalID, goal)
+        setCurrentWater(goal);
+        Alert.alert(
+          "Congratulations! 🎉", 
+          `You've reached your daily water goal! Added ${totalAmount}ml (${quantity} x ${volume}ml)`,
+        );
+      } else {
+        await updateCurrentAchieved(goalID, newWaterAmount)
+        setCurrentWater(newWaterAmount);
+        Alert.alert(
+          "Water Added! 💧",
+          `Added ${totalAmount}ml (${quantity} x ${volume}ml) to your daily intake`
+        );
+      }
+
+      // For storing water type
+      const newWaterType = await createWaterType(userID, waterTitle, volume, selectedColor, notes);
+
+      // For logging water in waterlogs
+      await logWaterIntake(userID, newWaterType.$id, quantity,)
+
+    } catch (error) {
+      console.log('Error adding water:', error);
+      Alert.alert('Error', 'Failed to add water. Please try again.');
     }
+
     router.dismiss();
   }
 
@@ -223,7 +256,7 @@ const Addwater = () => {
                 placeholderTextColor={'gray'}
                 blurOnSubmit={false}
                 returnKeyType="default"
-                // Add these props for better multiline handling
+                // For better multiline handling
                 scrollEnabled={false} // Let the parent ScrollView handle scrolling
                 style={{ textAlignVertical: 'top' }} // Ensure text starts at top
               />

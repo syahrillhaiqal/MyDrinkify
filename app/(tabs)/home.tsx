@@ -1,41 +1,101 @@
-import { Text, TouchableOpacity, View, Image, Button, Modal, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { router } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { getCurrentUser } from '@/lib/appwrite'
-import Ionicons from '@expo/vector-icons/Ionicons';
-import WaterBottleProgress from '@/components/WaterBottleProgress'
 import CustomButton from '@/components/CustomButton'
+import WaterBottleProgress from '@/components/WaterBottleProgress'
 import { useGlobalContext } from '@/context/GlobalProvider'
+import { getDailyGoal, getUserLatestGoal, setDailyGoal, updateDailyGoal } from '@/lib/appwrite'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { router } from 'expo-router'
+import React, { useEffect, useState } from 'react'
+import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const Home = () => {
 
-
   const {
     currentWater,
+    setCurrentWater,
     goal,
-    setGoal
+    setGoal,
+    user,
+    setGoalID,
+    goalID,
+    userID,
+    username,
+    setUserID,
+    setUsername
   } = useGlobalContext();
 
-  const [username, setUsername] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-
   const [tempGoal, setTempGoal] = useState('');
+  const [hasGoalToday, setHasGoalToday] = useState(false);
+  
   const [modalVisibility, setModalVisibility] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
 
-    // Fetch the current user
-    const fetchUser = async () => {
-      const user = await getCurrentUser();
-      if (user) {
-        setUsername(user.username);
+    // Add null check before accessing user properties
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+
+    setUsername(user.username);
+    setUserID(user.$id);
+    
+    // Fetch the current user and their goal
+    const fetchGoal = async () => {
+      try {
+        const todayDate = getTodayDate();
+        
+        // Check if user has today's goal
+        const todayGoal = await getDailyGoal(user.$id, todayDate);
+
+        if(todayGoal) {
+          // User already has goal for today
+          setGoal(todayGoal.target);
+          setGoalID(todayGoal.$id)
+          setHasGoalToday(true);
+          setCurrentWater(todayGoal.currentAchieved)
+        }
+        else {
+          // User doesn't have goal for today
+          setHasGoalToday(false);
+          
+          // Get user's latest goal to use as default
+          const latestGoal = await getUserLatestGoal(user.$id);
+          
+          if(latestGoal) {
+            // User has previous goals, create today's goal with same target
+            const newGoalDoc = await setDailyGoal(user.$id, todayDate, latestGoal.target);
+            
+            setGoal(latestGoal.target);
+            setGoalID(newGoalDoc.$id);
+            setHasGoalToday(true);
+            setCurrentWater(0); // Reset current water for new day
+          }
+          else {
+            // New user - no previous goals, show modal to set first goal
+            setGoal(0);
+            setModalVisibility(true);
+          }
+        }
+      } catch (error) {
+        console.log('Error fetching goal:', error);
+        Alert.alert('Error', 'Failed to load user data');
+      } finally {
         setIsLoading(false);
       }
     };
-    fetchUser();
+    fetchGoal();
 
-  }, []) // Added dependency array to prevent infinite loop
+
+  // router.replace('/(tabs)/calendar'); // FOR DEBUGGING
+
+
+  }, [user]) // add user as dependency so it runs when user changes
+
+  const getTodayDate = () => {
+    return new Date().toLocaleDateString();
+  };
 
   const openModal = () => {
     setTempGoal(goal.toString());
@@ -47,18 +107,43 @@ const Home = () => {
     setTempGoal('');
   }
 
-  const saveGoal = () => {
+  const saveGoal = async () => {
     const newGoal = parseInt(tempGoal);
     if (isNaN(newGoal) || newGoal <=0) {
-      Alert.alert('Invalid Goal', 'Plese enter a valid number');
+      Alert.alert('Invalid Goal', 'Please enter a valid number');
       return;
     }
-    setGoal(newGoal);
-    closeModal();
+
+    try {
+      const todayDate = getTodayDate();
+
+      // If goal exists today, update existing goal
+      if(hasGoalToday) {
+        await updateDailyGoal(goalID, newGoal);
+        setGoal(newGoal);
+        Alert.alert('Goal Updated', `Your daily goal has been updated to ${newGoal}ml`);
+      }
+      else {
+        // Create new goal for today
+        const newGoalDoc = await setDailyGoal(userID, todayDate, newGoal);
+
+        // UPDATE THE GLOBAL CONTEXT WITH THE NEW GOAL DATA
+        setGoal(newGoal);
+        setGoalID(newGoalDoc.$id);
+        setHasGoalToday(true);
+        Alert.alert('Goal Set', `Your daily goal has been set to ${newGoal}ml`);
+      }
+
+      closeModal();
+
+    } catch (error) {
+      console.log('Error saving goal:', error);
+      Alert.alert('Error', 'Failed to save goal. Please try again.');
+    }
   }
     
   return (
-    <SafeAreaView className="flex-1 px-4">
+    <SafeAreaView className="flex-1 px-4 bg-gray-50">
 
       <View className='flex flex-row justify-between items-center'>
 
@@ -89,32 +174,39 @@ const Home = () => {
       </View>
 
       {/* Water Bottle */}
-      <View className='mt-[28px] mb-[15px]'>
-        <WaterBottleProgress current={currentWater} goal={goal} width={225} height={450} />
+      {!isLoading ? (
+        <View className='mt-[28px] mb-[15px]'>
+          <WaterBottleProgress current={currentWater} goal={goal} width={225} height={450} />
 
-        {/* Conditional rendering based on goal achievement */}
-        {currentWater >= goal ? (
-          <View className='flex-row justify-center'>
-            <Text className='font-bold text-green-600 text-lg'>
-              🎉 You have achieved your goal today! 🎉
-            </Text>
+          {/* Conditional rendering based on goal achievement */}
+          {currentWater >= goal && goal !== 0 ? (
+            <View className='flex-row justify-center'>
+              <Text className='font-bold text-green-600 text-lg'>
+                🎉 You have achieved your goal today! 🎉
+              </Text>
+            </View>
+          ) : (
+            <View className='flex-row justify-center'>
+              <Text className='font-medium'>You have drink</Text>
+              <Text className='text-blue-600'> {currentWater}ml </Text>
+              <Text className='font-medium'>today</Text>
+            </View>
+          )}
+
+          <View className='items-center mt-2'>
+            <Text className='text-gray-500 text-sm'>Goal: {goal}ml</Text>
           </View>
-        ) : (
-          <View className='flex-row justify-center'>
-            <Text className='font-medium'>You have drink</Text>
-            <Text className='text-blue-600'> {currentWater}ml </Text>
-            <Text className='font-medium'>today</Text>
+
+          <View className='absolute left-1/2 -translate-x-1/2 bottom-[210px]'>
+            <Text className='font-bold text-gray-700'>{Math.max(0, goal - currentWater)} ml left</Text>
           </View>
-        )}
-
-        <View className='items-center mt-2'>
-          <Text className='text-gray-500 text-sm'>Goal: {goal}ml</Text>
         </View>
-
-        <View className='absolute left-1/2 -translate-x-1/2 bottom-[210px]'>
-          <Text className='font-bold text-gray-700'>{goal-currentWater} ml left</Text>
+      ) : (
+        // Loading state
+        <View className='mt-[28px] mb-[15px] items-center justify-center h-[450px]'>
+          <Text className='text-gray-500'>Loading your water goal...</Text>
         </View>
-      </View>
+      )}
       
       <View className='flex-row justify-center gap-3'>
         <CustomButton
@@ -142,35 +234,47 @@ const Home = () => {
                 
                 {/* Modal header */}
                 <View className='flex-row justify-between items-center mb-6'>
-                  <Text className='text-xl font-bold text-gray-800'>Set Daily Goal</Text>
+                  <Text className='text-xl font-bold text-gray-800'>
+                    {hasGoalToday ? 'Update Daily Goal' : 'Set Daily Goal'}
+                  </Text>
                   <TouchableOpacity onPress={closeModal} className='p-1'>
                     <Ionicons name='close' size={24} color='#6b7280' />
                   </TouchableOpacity>
                 </View>
 
                 {/* Current goal */}
-                <View className='mb-4 items-center'>
-                  <Text className='text-sm text-gray-600 mb-1'>Current Goal</Text>
-                  <Text className='text-2xl font-semibold text-blue-600'>{goal}ml</Text>
-                </View>
+                {hasGoalToday ? (
+                  <View className='mb-4 items-center'>
+                    <Text className='text-sm text-gray-600 mb-1'>Current Goal</Text>
+                    <Text className='text-2xl font-semibold text-blue-600'>{goal}ml</Text>
+                  </View>
+                ) : (
+                  <View className='mb-4 items-center'>
+                    <Text className='text-sm text-gray-600 mb-1'>Welcome! Set your first daily water goal</Text>
+                  </View>
+                )}
 
                 {/* Daily goal input */}
                 <View className='mb-6'>
                   <TextInput
                   className='border border-gray-300 rounded-lg px-4 py-3 text-base'
-                  placeholder='Enter your new daily goal'
+                  placeholder='Enter your daily goal (ml)'
                   placeholderTextColor={'gray'}
+                  keyboardType='numeric'
+                  value={tempGoal}
                   onChangeText={setTempGoal} // Set temp goal because user might cancel
                   />
                 </View>
                 
                 {/* Button */}
                 <View className='flex-row justify-end gap-2'>
-                  <CustomButton
-                  title='Cancel'
-                  handlePress={closeModal}
-                  containerStyles='bg-gray-100 w-1/4'
-                  />
+                  {hasGoalToday && (
+                    <CustomButton
+                    title='Cancel'
+                    handlePress={closeModal}
+                    containerStyles='bg-gray-100 w-1/4'
+                    />
+                  )}
                   <CustomButton
                   title='Save'
                   handlePress={saveGoal}
@@ -183,9 +287,6 @@ const Home = () => {
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
       </Modal>
-
-      {/* <Button title="Add 250 ml" onPress={() => setWater(Math.min(water + 250, goal))} />
-      <Button title="Reset" onPress={() => setWater(0)} /> */}
     </SafeAreaView>
   )
   

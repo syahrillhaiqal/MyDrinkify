@@ -2,10 +2,15 @@ import { KeyboardAvoidingView, Platform, Keyboard, ScrollView, Text, TextInput, 
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { getCurrentUser, signIn } from "../../lib/appwrite";
+import { getCurrentUser, signIn, signOut } from "../../lib/appwrite";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 export default function App() {
+
+  const { 
+    setUser, 
+    setIsLoggedIn 
+  } = useGlobalContext();
 
   // Set form state
   const [form, setForm] = useState({
@@ -25,9 +30,13 @@ export default function App() {
     else {
       try {
           await signIn(form.email, form.password);
-  
+          const result = await getCurrentUser();
+          setUser(result);
+          setIsLoggedIn(true);
+
           router.replace('/(tabs)/home');
           } catch (error) {
+            console.log(error);
               if (error instanceof Error) {
                   Alert.alert("Login Failed", "Invalid email or password");
               } else {
@@ -38,7 +47,19 @@ export default function App() {
     }
 
   useEffect(() => {
-    // router.replace('/');
+
+  // FOR DEBUGGING WHEN SESSION IS STILL EXISTS
+
+  //   const clearOldSession = async () => {
+  //   try {
+  //     await signOut();
+  //     console.log('Session cleared');
+  //   } catch (error) {
+  //     console.log('No session to clear');
+  //   }
+  // };
+
+  // clearOldSession();
   }, []);
 
   return ( 

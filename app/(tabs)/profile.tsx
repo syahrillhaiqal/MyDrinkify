@@ -12,13 +12,15 @@ const Profile = () => {
     setUser, 
     setIsLoggedIn,
     setCurrentWater,
-    currentWater
+    currentWater,
+    resetUserData
   } = useGlobalContext();
 
   const logout = async () => {
     await signOut();
     setUser(null);
     setIsLoggedIn(false);
+    resetUserData(); // reset global provider data
 
     router.replace("/(auth)/login");
   };
