@@ -29,12 +29,6 @@ const ProgressCalendar = () => {
   // useCallBack - its good to have it alongside with useFocusEffect so that it will always run the function and not create a new one
   useFocusEffect(
     useCallback(() => {
-      {/*
-      1. Dapatkan list of goal achieved in desc
-      2. Setiap line tambah satu ada tak, kalau takde kita marking type biasa (bulat)
-      3. Kalau ada so jadi period, so tambah je satu sampai jumpa last, dia jadi ending
-      4. ulang step 2
-      */}
       const fetchAchievedGoal = async () => {
         try {
           const achievedGoal = await getAchievedGoalDate(userID);
@@ -44,7 +38,7 @@ const ProgressCalendar = () => {
             return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
           });
 
-          // Sort dates in ascending order
+          // Sort dates in ascending orderj
           formattedDates.sort();
 
           // Convert array to a set for fast lookup (if using array, it need to check from beginning until found)
@@ -89,6 +83,8 @@ const ProgressCalendar = () => {
           const today = formatDate(new Date());
           let currentDate = dateSet.has(today) ? today : getPrevDate(today);
           let streak = 0;
+
+          console.log(dateSet)
 
           while (dateSet.has(currentDate)) {
             streak++;

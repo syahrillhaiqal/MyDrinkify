@@ -193,13 +193,15 @@ const Addwater = () => {
 
             <View className="mb-4">
               <Text className="text-base font-semibold text-gray-700 mb-2">Title</Text>
-              <TextInput
-                className="border border-gray-300 rounded-xl p-3 text-base"
-                placeholder="Water, Juice, Tea..."
-                placeholderTextColor={'gray'}
-                value={waterTitle}
-                onChangeText={setWaterTitle}
-              />
+                <TextInput
+                  className="border border-gray-300 rounded-xl p-3 text-base"
+                  placeholder="Water, Juice, Tea..."
+                  placeholderTextColor={'gray'}
+                  value={waterTitle}
+                  maxLength={20}
+                  onChangeText={setWaterTitle}
+                  autoCapitalize="words"
+                />
             </View>
 
             <View className="mb-4">
@@ -254,6 +256,7 @@ const Addwater = () => {
                 multiline
                 textAlignVertical="top"
                 placeholderTextColor={'gray'}
+                maxLength={40}
                 blurOnSubmit={false}
                 returnKeyType="default"
                 // For better multiline handling
