@@ -5,9 +5,9 @@ import { Loader } from '../../components';
 
 const AuthLayout = () => {
 
-  const { loading, isLogged } = useGlobalContext();
+  const { isLoading, isLoggedIn } = useGlobalContext();
 
-  if (!loading && isLogged) return <Redirect href="/home" />;
+  if (!isLoading && isLoggedIn) return <Redirect href="/home" />;
 
   return (
     <>
@@ -17,7 +17,7 @@ const AuthLayout = () => {
         animationDuration: 250,
       }}
       />
-      <Loader isLoading={loading} />
+      <Loader isLoading={isLoading} />
     </>
   )
 }

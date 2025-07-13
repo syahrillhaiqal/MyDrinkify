@@ -11,7 +11,7 @@ import { useFocusEffect } from 'expo-router';
 const ProgressCalendar = () => {
   
   const {
-    userID
+    user
   } = useGlobalContext();
 
   const [currentStreak, setCurrentStreak] = useState(0);
@@ -31,7 +31,7 @@ const ProgressCalendar = () => {
     useCallback(() => {
       const fetchAchievedGoal = async () => {
         try {
-          const achievedGoal = await getAchievedGoalDate(userID);
+          const achievedGoal = await getAchievedGoalDate(user.$id);
 
           const formattedDates = achievedGoal.map(dateStr => {
             const [day, month, year] = dateStr.split('/');
@@ -100,7 +100,7 @@ const ProgressCalendar = () => {
       };
 
       fetchAchievedGoal();
-    }, [userID])
+    }, [user.$id])
   );
 
   return (

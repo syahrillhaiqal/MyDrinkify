@@ -12,8 +12,6 @@ const GlobalProvider = ({ children }) => {
     // Authentication state
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [user, setUser] = useState(null);
-    const [userID, setUserID] = useState('')
-    const [username, setUsername] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     // Water tracking state
@@ -58,10 +56,6 @@ const GlobalProvider = ({ children }) => {
                 setIsLoggedIn,
                 user,
                 setUser,
-                userID,
-                setUserID,
-                username,
-                setUsername,
                 isLoading,
 
                 // Water tracking values

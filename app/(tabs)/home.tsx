@@ -1,11 +1,11 @@
 import CustomButton from '@/components/CustomButton'
 import WaterBottleProgress from '@/components/WaterBottleProgress'
 import { useGlobalContext } from '@/context/GlobalProvider'
-import { getDailyGoal, getUserLatestGoal, setDailyGoal, updateDailyGoal } from '@/lib/appwrite'
+import { getDailyGoal, getFileView, getUserLatestGoal, setDailyGoal, updateDailyGoal } from '@/lib/appwrite'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { router } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Alert, Keyboard, KeyboardAvoidingView, Modal, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Alert, Image, Keyboard, KeyboardAvoidingView, Modal, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const Home = () => {
@@ -18,28 +18,24 @@ const Home = () => {
     user,
     setGoalID,
     goalID,
-    userID,
-    username,
-    setUserID,
-    setUsername
   } = useGlobalContext();
 
   const [tempGoal, setTempGoal] = useState('');
   const [hasGoalToday, setHasGoalToday] = useState(false);
-  
   const [modalVisibility, setModalVisibility] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
   
   useEffect(() => {
-
-    // Add null check before accessing user properties
     if (!user) {
       setIsLoading(false);
       return;
     }
-
-    setUsername(user.username);
-    setUserID(user.$id);
+    
+    // Load profile image when component mounts
+    if (user?.profilePictureId) {
+      setProfileImage(getFileView(user.profilePictureId).toString());
+    }
     
     // Fetch the current user and their goal
     const fetchGoal = async () => {
@@ -87,9 +83,7 @@ const Home = () => {
     };
     fetchGoal();
 
-
   // router.replace('/(tabs)/calendar'); // FOR DEBUGGING
-
 
   }, [user]) // add user as dependency so it runs when user changes
 
@@ -107,7 +101,16 @@ const Home = () => {
     setTempGoal('');
   }
 
+  const navigateToProfile = () => {
+    router.push('/(tabs)/profile');
+  };
+
   const saveGoal = async () => {
+    if (!user) {
+      Alert.alert('Error', 'User not found. Please log in again.');
+      return;
+    }
+
     const newGoal = parseInt(tempGoal);
     if (isNaN(newGoal) || newGoal <=0) {
       Alert.alert('Invalid Goal', 'Please enter a valid number');
@@ -125,7 +128,7 @@ const Home = () => {
       }
       else {
         // Create new goal for today
-        const newGoalDoc = await setDailyGoal(userID, todayDate, newGoal);
+        const newGoalDoc = await setDailyGoal(user.$id, todayDate, newGoal);
 
         // UPDATE THE GLOBAL CONTEXT WITH THE NEW GOAL DATA
         setGoal(newGoal);
@@ -147,30 +150,27 @@ const Home = () => {
 
       <View className='flex flex-row justify-between items-center'>
 
-        <View className="mt-2">
+        <View className="mt-2 flex-1">
           <Text className="text-gray-600 text-base">Welcome Back</Text>
           <Text className="text-black text-3xl font-bold mt-1">
-            {isLoading ? 'Loading...' : username}
+            {isLoading ? 'Loading...' : (user?.username || 'User')}
           </Text>
         </View>
 
-        <View className='flex flex-row gap-2'>
-
-          <TouchableOpacity>
-            <Ionicons
-            name='notifications-outline'
-            size={32}
-            color={'#373737'}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Ionicons
-            name='settings-outline'
-            size={32}
-            color={'#373737'}
-            />
-          </TouchableOpacity>
-        </View>
+        {/* Profile Picture */}
+        <TouchableOpacity 
+          onPress={navigateToProfile}
+          className="mt-2 ml-4"
+        >
+          <Image 
+            source={
+              profileImage 
+                ? { uri: profileImage } 
+                : require("../../assets/images/placeholder-profile..jpg")
+            }
+            className="w-12 h-12 rounded-full border-2 border-gray-300 bg-gray-200"
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Water Bottle */}

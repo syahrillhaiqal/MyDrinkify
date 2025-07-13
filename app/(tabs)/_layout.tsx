@@ -1,9 +1,26 @@
-import { View, Text, TouchableOpacity, StatusBar } from 'react-native'
-import React from 'react'
-import { router, Stack, Tabs } from 'expo-router'
+import { useGlobalContext } from '@/context/GlobalProvider';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Redirect, router, Tabs } from 'expo-router';
+import React from 'react';
+import { StatusBar, Text, TouchableOpacity, View } from 'react-native';
 
 const TabsLayout = () => {
+  const { isLoading, isLoggedIn } = useGlobalContext();
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isLoggedIn) {
+    return <Redirect href="/(auth)/login" />;
+  }
+
   return (
     <>
       {/* Status bar */}

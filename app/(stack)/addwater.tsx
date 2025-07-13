@@ -11,11 +11,11 @@ const Addwater = () => {
   
   // Global context
   const {
+    user,
     setCurrentWater,
     currentWater,
     goal,
     goalID,
-    userID
   } = useGlobalContext();
 
   // State for water entry customization
@@ -130,10 +130,10 @@ const Addwater = () => {
       }
 
       // For storing water type
-      const newWaterType = await createWaterType(userID, waterTitle, volume, selectedColor, notes);
+      const newWaterType = await createWaterType(user.$id, waterTitle, volume, selectedColor, notes);
 
       // For logging water in waterlogs
-      await logWaterIntake(userID, newWaterType.$id, quantity,)
+      await logWaterIntake(user.$id, newWaterType.$id, quantity,)
 
     } catch (error) {
       console.log('Error adding water:', error);
