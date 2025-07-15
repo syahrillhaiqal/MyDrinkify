@@ -12,12 +12,17 @@
 
 ## 📱 Screenshots
 
-![Landing page](assets/screenshots/screenshots1.jpg)
-![Login page](assets/screenshots/screenshots2.jpg)
-![Home page](assets/screenshots/screenshots3.jpg)
-![Logging water page](assets/screenshots/screenshots4.jpg)
-![Progress calendar page](assets/screenshots/screenshots5.jpg)
-![Water log page](assets/screenshots/screenshots6.jpg)
+<p align="center">
+  <img src="assets/screenshots/screenshot1.jpg" width="250"/>
+  <img src="assets/screenshots/screenshot2.jpg" width="250"/>
+  <img src="assets/screenshots/screenshot3.jpg" width="250"/>
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/screenshot4.jpg" width="250"/>
+  <img src="assets/screenshots/screenshot5.jpg" width="250"/>
+  <img src="assets/screenshots/screenshot6.jpg" width="250"/>
+</p>
 
 ---
 
