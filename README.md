@@ -1,50 +1,133 @@
-# Welcome to your Expo app 👋
+# MyDrinkify
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**MyDrinkify** is a mobile application designed to help users track and improve their daily water intake. In today’s busy world, many people forget to drink enough water, which is essential for good health. MyDrinkify provides reminders, progress tracking, and insightful records to help users stay hydrated and build healthy habits.
 
-## Get started
+## 🚀 Features
 
-1. Install dependencies
+- **Water Intake Tracking:** Log your water consumption in real-time with simple, intuitive controls.
+- **Goal Management:** Set and adjust your daily water intake goals to suit your needs.
+- **Progress Visualization:** See your progress with an interactive water bottle display.
+- **Performance Records:** View daily, weekly, and monthly hydration history to analyze your habits.
+- **Streak System:** Stay motivated by maintaining streaks for consecutive days of meeting your hydration goals.
 
-   ```bash
-   npm install
-   ```
+## 📱 Screenshots
 
-2. Start the app
+<!-- Add screenshots of your app here to showcase the UI and features -->
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🛠️ Tech Stack
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **React Native** (with Expo)
+- **TypeScript**
+- **Tailwind CSS** (via NativeWind)
+- **Appwrite** (for backend services)
+- **Lottie** (for animations)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 📝 Getting Started
 
-When you're ready, run:
+Follow these steps to set up and run MyDrinkify on your local machine.
+
+### 1. Prerequisites
+
+- **Node.js** (v16 or higher recommended)
+- **npm** (v8 or higher) or **yarn**
+- **Expo CLI**  
+  Install globally if you don’t have it:
+  ```bash
+  npm install -g expo-cli
+  ```
+- **Appwrite** backend (optional, for full functionality)
+
+### 2. Clone the Repository
 
 ```bash
-npm run reset-project
+git clone https://github.com/your-username/MyDrinkify.git
+cd MyDrinkify
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 3. Install Dependencies
 
-## Learn more
+```bash
+npm install
+# or
+yarn install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 4. Configure Environment
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- If you use Appwrite, set up your Appwrite project and update the configuration in `lib/appwrite.js` with your endpoint and project ID.
+- (Optional) Add any environment variables or secrets as needed.
 
-## Join the community
+### 5. Start the Development Server
 
-Join our community of developers creating universal apps.
+```bash
+npm start
+# or
+yarn start
+# or
+expo start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- This will launch the Expo developer tools in your browser.
+- You can run the app on an Android/iOS emulator or on your physical device using the Expo Go app.
+
+### 6. Running on Device/Emulator
+
+- **Android/iOS Device:**  
+  Download the **Expo Go** app from the Play Store or App Store. Scan the QR code from the Expo DevTools in your browser.
+- **Emulator:**  
+  Make sure you have an Android or iOS emulator set up. Use the options in Expo DevTools to launch the app.
+
+---
+
+## 🧩 Project Structure
+
+```
+MyDrinkify/
+  app/                # App screens and navigation
+  assets/             # Images, fonts, animations
+  components/         # Reusable UI components
+  context/            # Global state management
+  lib/                # Appwrite and other libraries
+  global.css          # Global styles
+  tailwind.config.js  # Tailwind CSS config
+  ...
+```
+
+---
+
+## 🗂️ Useful Scripts
+
+- `npm start` / `yarn start` — Start the Expo development server
+- `npm run android` / `yarn android` — Run on Android emulator/device
+- `npm run ios` / `yarn ios` — Run on iOS simulator/device (Mac only)
+- `npm run web` / `yarn web` — Run in web browser
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙏 Acknowledgements
+
+- [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/)
+- [Appwrite](https://appwrite.io/)
+- [NativeWind](https://www.nativewind.dev/)
+- [Lottie](https://airbnb.io/lottie/)
+
+---
+
+**Stay hydrated, stay healthy! 💧**
