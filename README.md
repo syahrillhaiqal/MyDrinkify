@@ -12,7 +12,12 @@
 
 ## 📱 Screenshots
 
-<!-- Add screenshots of your app here to showcase the UI and features -->
+![Landing page](assets/screenshots/screenshots1.jpg)
+![Login page](assets/screenshots/screenshots2.jpg)
+![Home page](assets/screenshots/screenshots3.jpg)
+![Logging water page](assets/screenshots/screenshots4.jpg)
+![Progress calendar page](assets/screenshots/screenshots5.jpg)
+![Water log page](assets/screenshots/screenshots6.jpg)
 
 ---
 
@@ -22,7 +27,6 @@
 - **TypeScript**
 - **Tailwind CSS** (via NativeWind)
 - **Appwrite** (for backend services)
-- **Lottie** (for animations)
 
 ---
 
@@ -68,7 +72,7 @@ npm start
 # or
 yarn start
 # or
-expo start
+npm expo start
 ```
 
 - This will launch the Expo developer tools in your browser.
@@ -83,50 +87,9 @@ expo start
 
 ---
 
-## 🧩 Project Structure
-
-```
-MyDrinkify/
-  app/                # App screens and navigation
-  assets/             # Images, fonts, animations
-  components/         # Reusable UI components
-  context/            # Global state management
-  lib/                # Appwrite and other libraries
-  global.css          # Global styles
-  tailwind.config.js  # Tailwind CSS config
-  ...
-```
-
----
-
-## 🗂️ Useful Scripts
-
-- `npm start` / `yarn start` — Start the Expo development server
-- `npm run android` / `yarn android` — Run on Android emulator/device
-- `npm run ios` / `yarn ios` — Run on iOS simulator/device (Mac only)
-- `npm run web` / `yarn web` — Run in web browser
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-## 🙏 Acknowledgements
-
-- [React Native](https://reactnative.dev/)
-- [Expo](https://expo.dev/)
-- [Appwrite](https://appwrite.io/)
-- [NativeWind](https://www.nativewind.dev/)
-- [Lottie](https://airbnb.io/lottie/)
 
 ---
 
